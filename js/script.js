@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Nav elements
   const hamburger = document.querySelector('.hamburger');
-  const navLinks = document.querySelector('#navLinks'); // Updated to use ID
+  const navLinks = document.querySelector('#navLinks');
 
   // Testimonial elements
   const testimonialCards = document.querySelectorAll('.testimonial-card');
@@ -9,66 +9,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const prevBtn = document.querySelector('.arrow-prev');
   const nextBtn = document.querySelector('.arrow-next');
   const indicatorsContainer = document.querySelector('.testimonial-indicators');
-
-  let currentPosition = 0;
-  let cardWidth = 0;
-  const cardCount = testimonialCards.length;
+  let currentIndex = 0;
   let autoSlideInterval;
+  const cardCount = testimonialCards.length;
 
   // Update card width based on screen size (desktop only)
   const updateCardWidth = () => {
     if (window.innerWidth <= 768) {
       cardsWrapper.style.transform = 'translateX(0px)';
       cardsWrapper.style.transition = 'none';
+      indicatorsContainer.style.display = 'none';
       return false;
     }
-
-    cardWidth = 380 + 30;
-    const maxPosition = cardCount * cardWidth;
-    cardsWrapper.style.width = `${(cardCount * 2) * cardWidth}px`;
+    indicatorsContainer.style.display = 'flex';
     return true;
-  };
-
-  // Infinite loop setup for testimonials (desktop only)
-  const setupInfiniteLoop = () => {
-    testimonialCards.forEach(card => {
-      const clone = card.cloneNode(true);
-      cardsWrapper.appendChild(clone);
-    });
-  };
-
-  // Toggle mobile menu
-  const toggleMenu = () => {
-    console.log('Hamburger clicked'); // Debug log
-    if (!hamburger || !navLinks) {
-      console.error('Hamburger or navLinks not found');
-      return;
-    }
-    const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
-    console.log('isExpanded:', isExpanded); // Debug log
-    hamburger.setAttribute('aria-expanded', !isExpanded);
-    hamburger.classList.toggle('active', !isExpanded);
-    navLinks.classList.toggle('show', !isExpanded);
-    console.log('navLinks classList:', navLinks.classList); // Debug log
-    if (window.innerWidth > 768) {
-      isExpanded ? startAutoSlide() : pauseAutoSlide();
-    }
-  };
-
-  // Close menu when clicking outside
-  const closeMenuOnClickOutside = (event) => {
-    if (!hamburger || !navLinks) return;
-    const isClickInsideHamburger = event.target.closest('.hamburger');
-    const isClickInsideNavLinks = event.target.closest('.nav-links');
-    if (!isClickInsideHamburger && !isClickInsideNavLinks) {
-      console.log('Clicked outside, closing menu'); // Debug log
-      navLinks.classList.remove('show');
-      hamburger.classList.remove('active');
-      hamburger.setAttribute('aria-expanded', 'false');
-      if (window.innerWidth > 768) {
-        startAutoSlide();
-      }
-    }
   };
 
   // Create indicators for testimonials (desktop only)
@@ -79,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const indicator = document.createElement('div');
       indicator.classList.add('testimonial-indicator');
       if (i === 0) indicator.classList.add('active');
-      indicator.addEventListener('click', () => goToPosition(i));
+      indicator.addEventListener('click', () => goToSlide(i));
       indicatorsContainer.appendChild(indicator);
     }
   };
@@ -88,69 +42,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateIndicators = () => {
     if (window.innerWidth <= 768) return;
     const indicators = document.querySelectorAll('.testimonial-indicator');
-    const activeIndex = Math.round((currentPosition % (cardCount * cardWidth)) / cardWidth) % cardCount;
     indicators.forEach((indicator, index) => {
-      indicator.classList.toggle('active', index === activeIndex);
+      indicator.classList.toggle('active', index === currentIndex);
     });
   };
 
-  // Go to specific testimonial (desktop only)
-  const goToPosition = (index) => {
+  // Go to specific slide (desktop only)
+  const goToSlide = (index) => {
     if (window.innerWidth <= 768) return;
-    currentPosition = index * cardWidth;
-    const maxPosition = cardCount * cardWidth;
-    if (currentPosition >= maxPosition) {
-      currentPosition = currentPosition % maxPosition;
-      cardsWrapper.style.transition = 'none';
-      cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
-      void cardsWrapper.offsetWidth;
-      cardsWrapper.style.transition = 'transform 0.8s ease';
-    }
-    cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
+    currentIndex = index;
+    const cardWidth = testimonialCards[0].offsetWidth + 30; // Card width + gap
+    cardsWrapper.style.transition = 'transform 0.8s ease';
+    cardsWrapper.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
     updateIndicators();
   };
 
   // Slide to next testimonial (desktop only)
-  const nextPosition = () => {
+  const nextSlide = () => {
     if (window.innerWidth <= 768) return;
-    currentPosition += cardWidth;
-    const maxPosition = cardCount * cardWidth;
-    cardsWrapper.style.transition = 'transform 0.8s ease';
-    cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
-    if (currentPosition >= maxPosition) {
-      setTimeout(() => {
-        currentPosition = 0;
-        cardsWrapper.style.transition = 'none';
-        cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
-        void cardsWrapper.offsetWidth;
-        cardsWrapper.style.transition = 'transform 0.8s ease';
-      }, 800);
-    }
-    updateIndicators();
+    currentIndex = (currentIndex + 1) % cardCount;
+    goToSlide(currentIndex);
   };
 
   // Slide to previous testimonial (desktop only)
-  const prevPosition = () => {
+  const prevSlide = () => {
     if (window.innerWidth <= 768) return;
-    currentPosition -= cardWidth;
-    cardsWrapper.style.transition = 'transform 0.8s ease';
-    cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
-    if (currentPosition < 0) {
-      setTimeout(() => {
-        currentPosition = (cardCount * cardWidth) - cardWidth;
-        cardsWrapper.style.transition = 'none';
-        cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
-        void cardsWrapper.offsetWidth;
-        cardsWrapper.style.transition = 'transform 0.8s ease';
-      }, 800);
-    }
-    updateIndicators();
+    currentIndex = (currentIndex - 1 + cardCount) % cardCount;
+    goToSlide(currentIndex);
   };
 
   // Start auto-sliding (desktop only)
   const startAutoSlide = () => {
     if (window.innerWidth <= 768 || cardCount <= 1) return;
-    autoSlideInterval = setInterval(nextPosition, 8000);
+    autoSlideInterval = setInterval(nextSlide, 8000);
   };
 
   // Pause auto-sliding
@@ -158,11 +82,30 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(autoSlideInterval);
   };
 
-  // Reset auto-slide on interaction (desktop only)
-  const resetAutoSlide = () => {
-    if (window.innerWidth <= 768) return;
-    pauseAutoSlide();
-    startAutoSlide();
+  // Toggle mobile menu
+  const toggleMenu = (event) => {
+    if (!hamburger || !navLinks) {
+      console.error('Hamburger or navLinks not found');
+      return;
+    }
+    event.stopPropagation(); // Prevent click from bubbling to document
+    navLinks.classList.toggle('show');
+    hamburger.classList.toggle('active');
+    const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
+    hamburger.setAttribute('aria-expanded', !isExpanded);
+    console.log('NavLinks show:', navLinks.classList.contains('show')); // Debug
+  };
+
+  // Close menu when clicking outside
+  const closeMenuOnClickOutside = (event) => {
+    if (!hamburger || !navLinks) return;
+    const isClickInsideNavbar = event.target.closest('.navbar');
+    if (!isClickInsideNavbar && navLinks.classList.contains('show')) {
+      navLinks.classList.remove('show');
+      hamburger.classList.remove('active');
+      hamburger.setAttribute('aria-expanded', 'false');
+      console.log('Menu closed via outside click'); // Debug
+    }
   };
 
   // Smooth scrolling for anchor links
@@ -173,15 +116,13 @@ document.addEventListener('DOMContentLoaded', () => {
           e.preventDefault();
           const target = document.querySelector(anchor.hash);
           if (target) {
-            const offset = window.innerWidth <= 480 ? 50 : window.innerWidth <= 576 ? 60 : window.innerWidth <= 768 ? 70 : 100;
+            const offset = window.innerWidth <= 480 ? 50 : window.innerWidth <= 576 ? 60 : window.innerWidth <= 768 ? 70 : 90;
             window.scrollTo({
               top: target.offsetTop - offset,
               behavior: 'smooth'
             });
             if (window.innerWidth <= 768 && navLinks.classList.contains('show')) {
-              navLinks.classList.remove('show');
-              hamburger.classList.remove('active');
-              hamburger.setAttribute('aria-expanded', 'false');
+              toggleMenu(e);
             }
           }
         }
@@ -205,10 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hamburger) {
       hamburger.setAttribute('aria-expanded', 'false');
       hamburger.addEventListener('click', toggleMenu);
+      document.addEventListener('click', closeMenuOnClickOutside);
     } else {
       console.error('Hamburger button not found in the DOM');
     }
-    document.addEventListener('click', closeMenuOnClickOutside);
 
     // Smooth scrolling
     setupSmoothScrolling();
@@ -221,29 +162,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Testimonial carousel (desktop only)
     if (cardCount > 0) {
-      setupInfiniteLoop();
       createIndicators();
-
       if (prevBtn) {
         prevBtn.addEventListener('click', () => {
-          prevPosition();
-          resetAutoSlide();
+          prevSlide();
+          pauseAutoSlide();
+          startAutoSlide();
         });
       }
-
       if (nextBtn) {
         nextBtn.addEventListener('click', () => {
-          nextPosition();
-          resetAutoSlide();
+          nextSlide();
+          pauseAutoSlide();
+          startAutoSlide();
         });
       }
-
       const container = document.querySelector('.testimonial-container');
       if (container) {
         container.addEventListener('mouseenter', pauseAutoSlide);
         container.addEventListener('mouseleave', startAutoSlide);
       }
-
       if (window.innerWidth > 768) {
         startAutoSlide();
       }
@@ -254,19 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const isDesktopMode = updateCardWidth();
       createIndicators();
       if (isDesktopMode) {
-        goToPosition(Math.round(currentPosition / cardWidth));
+        goToSlide(currentIndex);
         startAutoSlide();
       } else {
         pauseAutoSlide();
       }
-      if (window.innerWidth > 768) {
-        if (navLinks) {
-          navLinks.classList.remove('show');
-        }
-        if (hamburger) {
-          hamburger.classList.remove('active');
-          hamburger.setAttribute('aria-expanded', 'false');
-        }
+      if (window.innerWidth > 768 && navLinks && hamburger) {
+        navLinks.classList.remove('show');
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
       }
     });
 

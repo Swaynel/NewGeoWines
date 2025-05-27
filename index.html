@@ -43,9 +43,12 @@
     <main>
         <section id="home">
             <div class="card1">
-                <h1>Discover Premium Spirits<br>From Around the World</h1>
-                <p>Carefully curated selection of fine wines, spirits, and craft beers<br>delivered straight to your doorstep.</p>
-                <a href="#products">Shop Now</a>
+                <img src="assets/imgs/interior.jpg" alt="Interior" class="card1-img">
+                <div class="card1-content">
+                    <h1>Discover Premium Spirits<br>From Around the World</h1>
+                    <p>Carefully curated selection of fine wines, spirits, and craft beers<br>delivered straight to your doorstep.</p>
+                    <a href="#products">Shop Now</a>
+                </div>
             </div>
         </section>
 
@@ -58,7 +61,7 @@
                     <a href="#about">Learn More</a>
                 </div>
                 <div class="card2b">
-                    <img src="assets/wine-cellars.jpg" alt="GeoWines premium selection">
+                    <img src="assets/imgs/interior.jpg" alt="GeoWines premium selection">
                 </div>
             </div>
         </section>
@@ -72,13 +75,6 @@
         </section>
 
         <section id="products">
-            <div class="card5">
-                <h1>Premium Product Selection</h1>
-                <p>Our collection features rare vintages, small-batch spirits,<br>and craft beers that you won't find in ordinary stores.</p>
-                <p>Each product is carefully selected by our team of experts<br>to ensure exceptional quality and taste.</p>
-                <a href="#products">Browse Collection</a>
-            </div>
-
             <div class="card4">
                 <div class="card4a">
                     <h1>Wine<br>Club</h1>
@@ -90,6 +86,12 @@
                     <p>Impress your clients with premium<br>custom-branded liquor selections.</p>
                     <a href="#corporate">Learn more</a>
                 </div>
+            </div>
+            <div class="card5">
+                <h1>Premium Product Selection</h1>
+                <p>Our collection features rare vintages, small-batch spirits,<br>and craft beers that you won't find in ordinary stores.</p>
+                <p>Each product is carefully selected by our team of experts<br>to ensure exceptional quality and taste.</p>
+                <a href="#products">Browse Collection</a>
             </div>
         </section>
 
@@ -131,7 +133,7 @@
         <section id="partners">
             <div class="card7">
                 <p>OUR PARTNERS</p>
-                <img class="partnerspic" src="assets/winery-partners.jpg" alt="GeoWines partner wineries">
+                <img class="partnerspic" src="assets/imgs/winery-partners.jpg" alt="GeoWines partner wineries">
             </div>
         </section>
 
@@ -176,7 +178,7 @@
                     <p>NEED HELP?</p>
                     <h1>Frequently Asked Questions</h1>
                     <p>Find answers to common questions about our products, services, and delivery options.</p>
-                    <img src="assets/wine-wellness-illustration.jpg" alt="Wine wellness illustration">
+                    <img src="assets/imgs/wine-wellness.jpg" alt="Wine wellness illustration">
                 </div>
                 <div class="card11b">
                     <div class="faq-container">
@@ -200,6 +202,26 @@
                             <summary>Is my order information kept secure?</summary>
                             <div class="faq-content">Absolutely. We use industry-standard encryption to ensure your order details and personal information are secure.</div>
                         </details>
+                        <details>
+                            <summary>How long does shipping usually take?</summary>
+                            <div class="faq-content">Shipping typically takes 3-7 business days depending on your location and the shipping option you choose.</div>
+                        </details>
+                        <details>
+                            <summary>What is your return policy?</summary>
+                            <div class="faq-content">If you receive a damaged or incorrect product, please contact our support within 7 days for a full refund or replacement.</div>
+                        </details>
+                        <details>
+                            <summary>Can I gift a Wine Club subscription to someone else?</summary>
+                            <div class="faq-content">Yes! You can purchase gift subscriptions and have them delivered directly to the recipient’s address.</div>
+                        </details>
+                        <details>
+                            <summary>Do you offer tastings or events?</summary>
+                            <div class="faq-content">We host exclusive tastings and events for members. Keep an eye on our newsletter and event page for upcoming dates.</div>
+                        </details>
+                        <details>
+                            <summary>Are your wines organic or sustainably sourced?</summary>
+                            <div class="faq-content">We prioritize sourcing wines from organic and sustainable vineyards whenever possible to ensure quality and environmental care.</div>
+                        </details>
                     </div>
                 </div>
             </div>
@@ -220,17 +242,17 @@
                         <p><strong>Phone:</strong> +1 (555) 123-4567</p>
                         <p><strong>Address:</strong> 123 Vine Street, Napa Valley, CA 94558</p>
                         <div>
-                            <img src="assets/facebook-icon.png" alt="Facebook">
-                            <img src="assets/instagram-icon.png" alt="Instagram">
-                            <img src="assets/twitter-icon.png" alt="Twitter">
-                            <img src="assets/linkedin-icon.png" alt="LinkedIn">
+                            <img src="assets/imgs/facebook-icon.png" alt="Facebook">
+                            <img src="assets/imgs/instagram-icon.png" alt="Instagram">
+                            <img src="assets/imgs/twitter-icon.png" alt="Twitter">
+                            <img src="assets/imgs/linkedin-icon.png" alt="LinkedIn">
                         </div>
                         <p>We respond within 2 business hours</p>
                     </div>
 
                     <div>
                         <h1>Send Us a Message</h1>
-                        <form>
+                        <form action="/submit-contact" method="POST">
                             <label for="email">Email:</label>
                             <input id="email" name="email" type="email" required placeholder="Your email address">
                             <label for="message">Message:</label>
@@ -249,21 +271,21 @@
                 <h1>GeoWines</h1>
                 <div class="footerItems">
                     <div>
-                        <p>About</p>
-                        <p>Products</p>
-                        <p>Services</p>
-                        <p>Resources</p>
-                        <p>Contact</p>
+                        <p><a href="#about">About</a></p>
+                        <p><a href="#products">Products</a></p>
+                        <p><a href="#services">Services</a></p>
+                        <p><a href="#resources">Resources</a></p>
+                        <p><a href="#contact">Contact</a></p>
                     </div>
                     <div>
-                        <p>Instagram</p>
-                        <p>Facebook</p>
-                        <p>YouTube</p>
-                        <p>LinkedIn</p>
+                        <p><a href="https://www.instagram.com">Instagram</a></p>
+                        <p><a href="https://www.facebook.com">Facebook</a></p>
+                        <p><a href="https://www.youtube.com">YouTube</a></p>
+                        <p><a href="https://www.linkedin.com">LinkedIn</a></p>
                     </div>
                     <div>
-                        <p>Terms Of Use</p>
-                        <p>Privacy Policy</p>
+                        <p><a href="#terms">Terms Of Use</a></p>
+                        <p><a href="#privacy">Privacy Policy</a></p>
                     </div>
                 </div>
                 <p>© 2025 GeoWines. All rights reserved</p>
