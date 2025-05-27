@@ -1,67 +1,80 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Nav elements - keeping selectors same as CSS
+  // Nav elements
   const hamburger = document.querySelector('.hamburger');
-  const navLinks = document.querySelector('.nav-links');
-  
-  // Testimonial elements - matching CSS classes
+  const navLinks = document.querySelector('#navLinks'); // Updated to use ID
+
+  // Testimonial elements
   const testimonialCards = document.querySelectorAll('.testimonial-card');
   const cardsWrapper = document.querySelector('.testimonial-cards-wrapper');
   const prevBtn = document.querySelector('.arrow-prev');
   const nextBtn = document.querySelector('.arrow-next');
   const indicatorsContainer = document.querySelector('.testimonial-indicators');
-  
+
   let currentPosition = 0;
-  let cardWidth = 410; // Card width (380px) + gap (30px) on desktop
+  let cardWidth = 0;
   const cardCount = testimonialCards.length;
-  let maxPosition = cardCount * cardWidth;
   let autoSlideInterval;
 
-  // Adjust card width based on screen size
+  // Update card width based on screen size (desktop only)
   const updateCardWidth = () => {
-    if (window.innerWidth <= 480) {
-      cardWidth = 270; // Matches 240px card + 30px gap at 480px
-    } else if (window.innerWidth <= 576) {
-      cardWidth = 300; // Matches 270px card + 30px gap at 576px
-    } else if (window.innerWidth <= 768) {
-      cardWidth = 330; // Matches 300px card + 30px gap at 768px
-    } else {
-      cardWidth = 410; // Desktop default
+    if (window.innerWidth <= 768) {
+      cardsWrapper.style.transform = 'translateX(0px)';
+      cardsWrapper.style.transition = 'none';
+      return false;
     }
-    maxPosition = cardCount * cardWidth;
-    cardsWrapper.style.width = `${(cardCount * 2) * cardWidth}px`; // Update for clones
+
+    cardWidth = 380 + 30;
+    const maxPosition = cardCount * cardWidth;
+    cardsWrapper.style.width = `${(cardCount * 2) * cardWidth}px`;
+    return true;
   };
 
-  // Infinite loop setup for testimonials
+  // Infinite loop setup for testimonials (desktop only)
   const setupInfiniteLoop = () => {
     testimonialCards.forEach(card => {
       const clone = card.cloneNode(true);
       cardsWrapper.appendChild(clone);
     });
-    updateCardWidth();
   };
 
   // Toggle mobile menu
   const toggleMenu = () => {
+    console.log('Hamburger clicked'); // Debug log
+    if (!hamburger || !navLinks) {
+      console.error('Hamburger or navLinks not found');
+      return;
+    }
     const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
-    navLinks.classList.toggle('show', !isExpanded);
-    hamburger.classList.toggle('active', !isExpanded);
+    console.log('isExpanded:', isExpanded); // Debug log
     hamburger.setAttribute('aria-expanded', !isExpanded);
-    isExpanded ? startAutoSlide() : pauseAutoSlide();
-  };
-  
-  // Close menu when clicking outside
-  const closeMenuOnClickOutside = (event) => {
-    if (!event.target.closest('.navbar') || event.target.closest('.nav-links a')) {
-      navLinks.classList.remove('show');
-      hamburger.classList.remove('active');
-      hamburger.setAttribute('aria-expanded', 'false');
-      startAutoSlide();
+    hamburger.classList.toggle('active', !isExpanded);
+    navLinks.classList.toggle('show', !isExpanded);
+    console.log('navLinks classList:', navLinks.classList); // Debug log
+    if (window.innerWidth > 768) {
+      isExpanded ? startAutoSlide() : pauseAutoSlide();
     }
   };
 
-  // Create indicators for testimonials
+  // Close menu when clicking outside
+  const closeMenuOnClickOutside = (event) => {
+    if (!hamburger || !navLinks) return;
+    const isClickInsideHamburger = event.target.closest('.hamburger');
+    const isClickInsideNavLinks = event.target.closest('.nav-links');
+    if (!isClickInsideHamburger && !isClickInsideNavLinks) {
+      console.log('Clicked outside, closing menu'); // Debug log
+      navLinks.classList.remove('show');
+      hamburger.classList.remove('active');
+      hamburger.setAttribute('aria-expanded', 'false');
+      if (window.innerWidth > 768) {
+        startAutoSlide();
+      }
+    }
+  };
+
+  // Create indicators for testimonials (desktop only)
   const createIndicators = () => {
     indicatorsContainer.innerHTML = '';
+    if (window.innerWidth <= 768) return;
     for (let i = 0; i < cardCount; i++) {
       const indicator = document.createElement('div');
       indicator.classList.add('testimonial-indicator');
@@ -71,32 +84,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Update active indicator
+  // Update active indicator (desktop only)
   const updateIndicators = () => {
+    if (window.innerWidth <= 768) return;
     const indicators = document.querySelectorAll('.testimonial-indicator');
-    const activeIndex = Math.round((currentPosition % maxPosition) / cardWidth) % cardCount;
+    const activeIndex = Math.round((currentPosition % (cardCount * cardWidth)) / cardWidth) % cardCount;
     indicators.forEach((indicator, index) => {
       indicator.classList.toggle('active', index === activeIndex);
     });
   };
 
-  // Go to specific testimonial
+  // Go to specific testimonial (desktop only)
   const goToPosition = (index) => {
+    if (window.innerWidth <= 768) return;
     currentPosition = index * cardWidth;
+    const maxPosition = cardCount * cardWidth;
     if (currentPosition >= maxPosition) {
       currentPosition = currentPosition % maxPosition;
       cardsWrapper.style.transition = 'none';
       cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
-      void cardsWrapper.offsetWidth; // Trigger reflow
+      void cardsWrapper.offsetWidth;
       cardsWrapper.style.transition = 'transform 0.8s ease';
     }
     cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
     updateIndicators();
   };
 
-  // Slide to next testimonial
+  // Slide to next testimonial (desktop only)
   const nextPosition = () => {
+    if (window.innerWidth <= 768) return;
     currentPosition += cardWidth;
+    const maxPosition = cardCount * cardWidth;
     cardsWrapper.style.transition = 'transform 0.8s ease';
     cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
     if (currentPosition >= maxPosition) {
@@ -111,14 +129,15 @@ document.addEventListener('DOMContentLoaded', () => {
     updateIndicators();
   };
 
-  // Slide to previous testimonial
+  // Slide to previous testimonial (desktop only)
   const prevPosition = () => {
+    if (window.innerWidth <= 768) return;
     currentPosition -= cardWidth;
     cardsWrapper.style.transition = 'transform 0.8s ease';
     cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
     if (currentPosition < 0) {
       setTimeout(() => {
-        currentPosition = maxPosition - cardWidth;
+        currentPosition = (cardCount * cardWidth) - cardWidth;
         cardsWrapper.style.transition = 'none';
         cardsWrapper.style.transform = `translateX(-${currentPosition}px)`;
         void cardsWrapper.offsetWidth;
@@ -128,11 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updateIndicators();
   };
 
-  // Start auto-sliding
+  // Start auto-sliding (desktop only)
   const startAutoSlide = () => {
-    if (cardCount > 1) {
-      autoSlideInterval = setInterval(nextPosition, 8000);
-    }
+    if (window.innerWidth <= 768 || cardCount <= 1) return;
+    autoSlideInterval = setInterval(nextPosition, 8000);
   };
 
   // Pause auto-sliding
@@ -140,8 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(autoSlideInterval);
   };
 
-  // Reset auto-slide on interaction
+  // Reset auto-slide on interaction (desktop only)
   const resetAutoSlide = () => {
+    if (window.innerWidth <= 768) return;
     pauseAutoSlide();
     startAutoSlide();
   };
@@ -184,56 +203,76 @@ document.addEventListener('DOMContentLoaded', () => {
   const init = () => {
     // Mobile menu setup
     if (hamburger) {
+      hamburger.setAttribute('aria-expanded', 'false');
       hamburger.addEventListener('click', toggleMenu);
+    } else {
+      console.error('Hamburger button not found in the DOM');
     }
     document.addEventListener('click', closeMenuOnClickOutside);
-    
+
     // Smooth scrolling
     setupSmoothScrolling();
-    
+
     // Form handling
     const contactForm = document.querySelector('form');
     if (contactForm) {
       contactForm.addEventListener('submit', handleFormSubmit);
     }
-    
-    // Testimonial carousel
+
+    // Testimonial carousel (desktop only)
     if (cardCount > 0) {
       setupInfiniteLoop();
       createIndicators();
-      
+
       if (prevBtn) {
         prevBtn.addEventListener('click', () => {
           prevPosition();
           resetAutoSlide();
         });
       }
-      
+
       if (nextBtn) {
         nextBtn.addEventListener('click', () => {
           nextPosition();
           resetAutoSlide();
         });
       }
-      
+
       const container = document.querySelector('.testimonial-container');
       if (container) {
         container.addEventListener('mouseenter', pauseAutoSlide);
         container.addEventListener('mouseleave', startAutoSlide);
       }
-      
-      startAutoSlide();
-    }
-    
-    // Update card width on resize
-    window.addEventListener('resize', () => {
-      updateCardWidth();
+
       if (window.innerWidth > 768) {
-        navLinks.classList.remove('show');
-        hamburger.classList.remove('active');
-        hamburger.setAttribute('aria-expanded', 'false');
+        startAutoSlide();
+      }
+    }
+
+    // Update layout on resize
+    window.addEventListener('resize', () => {
+      const isDesktopMode = updateCardWidth();
+      createIndicators();
+      if (isDesktopMode) {
+        goToPosition(Math.round(currentPosition / cardWidth));
+        startAutoSlide();
+      } else {
+        pauseAutoSlide();
+      }
+      if (window.innerWidth > 768) {
+        if (navLinks) {
+          navLinks.classList.remove('show');
+        }
+        if (hamburger) {
+          hamburger.classList.remove('active');
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
       }
     });
+
+    // Initial layout update
+    updateCardWidth();
+    createIndicators();
   };
 
   init();
